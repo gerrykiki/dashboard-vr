@@ -1,0 +1,80 @@
+[
+  {
+    "timestamp": "2026-09-19T17:06:12.613Z",
+    "status": "UPDATED",
+    "modules": [
+      {
+        "Id": "CX_1",
+        "Type": "#SoftwareInventory.v1_10_2.SoftwareInventory",
+        "Version": "28.44.1036",
+        "Description": "Other image"
+      },
+      {
+        "Id": "FW_BMC_0",
+        "Type": "#SoftwareInventory.v1_10_2.SoftwareInventory",
+        "Version": "v00.03.01.01",
+        "Description": "BMC image"
+      },
+      {
+        "Id": "FW_CPLD_0",
+        "Type": "#SoftwareInventory.v1_10_2.SoftwareInventory",
+        "Version": "0.2A",
+        "Description": "Other image"
+      },
+      {
+        "Id": "FW_ProcessorModule_SMA_0",
+        "Type": "#SoftwareInventory.v1_10_2.SoftwareInventory",
+        "Version": "0022.01.0361.0000",
+        "Description": "Other image"
+      },
+      {
+        "Id": "FW_StorageBackplane_SMA_0",
+        "Type": "#SoftwareInventory.v1_10_2.SoftwareInventory",
+        "Version": "0005.02.0050.0000",
+        "Description": "Other image"
+      },
+      {
+        "Id": "NVMe_68",
+        "Type": "#SoftwareInventory.v1_10_2.SoftwareInventory",
+        "Version": "1ZET7102",
+        "Description": "System image"
+      },
+      {
+        "Id": "SBIOS_FMC_0",
+        "Type": "#SoftwareInventory.v1_10_2.SoftwareInventory",
+        "Version": "06.06.01.04",
+        "Description": "Other image"
+      },
+      {
+        "Id": "SBIOS_FMC_1",
+        "Type": "#SoftwareInventory.v1_10_2.SoftwareInventory",
+        "Version": "06.06.01.04",
+        "Description": "Other image"
+      },
+      {
+        "Id": "SBIOS_FW_0",
+        "Type": "#SoftwareInventory.v1_10_2.SoftwareInventory",
+        "Version": "02.02.01.10",
+        "Description": "Other image"
+      },
+      {
+        "Id": "SBIOS_FW_1",
+        "Type": "#SoftwareInventory.v1_10_2.SoftwareInventory",
+        "Version": "02.02.01.10",
+        "Description": "Other image"
+      },
+      {
+        "Id": "bios_active",
+        "Type": "#SoftwareInventory.v1_10_2.SoftwareInventory",
+        "Version": "null",
+        "Description": "Host image"
+      },
+      {
+        "Id": "bmc_active",
+        "Type": "#SoftwareInventory.v1_10_2.SoftwareInventory",
+        "Version": "v00.03.01.01",
+        "Description": "BMC image"
+      }
+    ]
+  }
+]
