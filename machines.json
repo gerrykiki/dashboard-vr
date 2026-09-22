@@ -1,0 +1,24 @@
+{
+    "machines": [
+        {
+            "name": "OALan Vader.TS2 for Bespin BMC",
+            "ip": "10.33.33.224",
+            "machine_type": "TS2_BMC"
+        },
+        {
+            "name": "OALan Vader.TS2 for Bespin BIOS",
+            "ip": "10.33.33.187",
+            "machine_type": "TS2_BIOS"
+        },
+        {
+            "name": "OALan Vader.QS1 for Bespin BIOS",
+            "ip": "10.33.33.71",
+            "machine_type": "QS1_BIOS"
+        },
+        {
+            "name": "OALan Vader.QS1 for Bespin TSC",
+            "ip": "10.33.33.173",
+            "machine_type": "QS1_TSC"    
+        }
+    ]
+}
