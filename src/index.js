@@ -25,6 +25,7 @@ const previousFirmwareVersions = new Map();
 const ROOT_DIR = process.cwd();
 const DATA_DIR = path.join(ROOT_DIR, 'data');
 const MACHINES_FILE = path.join(ROOT_DIR, 'machines.json');
+const METADATA_FILE = path.join(ROOT_DIR, 'metadata.json');
 
 // 如果 data 資料夾不存在，就自動建立
 fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -120,6 +121,78 @@ function writeHistoryRecord(historyFile, record) {
 }
 
 /**
+ * 依 timestamp 由新到舊排序歷史紀錄
+ */
+function sortHistoryByTimestampDesc(history) {
+  return [...history].sort(
+    (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+  );
+}
+
+/**
+ * 取資料的 API 回傳的 modules 維持 Id/Type/Version/Description 四個欄位，
+ * 存檔本身仍是整包資料
+ */
+function toSummaryModules(modules) {
+  return (modules || []).map((item) => ({
+    Id: item.Id || null,
+    Type: item.Type || null,
+    Version: item.Version || null,
+    Description: item.Description || null
+  }));
+}
+
+function toSummaryHistory(history) {
+  return history.map((record) => ({
+    ...record,
+    modules: toSummaryModules(record.modules)
+  }));
+}
+
+/**
+ * 把物件裡含特殊符號的 key（如 @odata.id、@odata.type、XXX@odata.count）
+ * 改成合法的 key 名稱，遞迴處理巢狀物件與陣列
+ *
+ * @odata.id / @odata.type 一律覆蓋掉同層原本的 Id / Type，不受欄位順序影響
+ */
+function sanitizeKeys(value) {
+  if (Array.isArray(value)) {
+    return value.map((item) => sanitizeKeys(item));
+  }
+
+  if (value === null || typeof value !== 'object') {
+    return value;
+  }
+
+  const result = {};
+  const overrides = {};
+
+  for (const [key, val] of Object.entries(value)) {
+    const sanitizedVal = sanitizeKeys(val);
+
+    if (key === '@odata.id') {
+      overrides.Id = sanitizedVal;
+      continue;
+    }
+
+    if (key === '@odata.type') {
+      overrides.Type = sanitizedVal;
+      continue;
+    }
+
+    const countMatch = key.match(/^(.+)@odata\.count$/);
+    if (countMatch) {
+      result[`${countMatch[1]}Count`] = sanitizedVal;
+      continue;
+    }
+
+    result[key] = sanitizedVal;
+  }
+
+  return { ...result, ...overrides };
+}
+
+/**
  * 取得 Firmware 版本比較用的資料
  */
 function normalizeFirmwareVersions(list) {
@@ -171,13 +244,8 @@ async function pollMachine(machine) {
 
     const data = await response.json();
 
-    // 只保留需要的欄位
-    const firmwareList = (data.Members || []).map((item) => ({
-      Id: item.Id || null,
-      Type: item['@odata.type'] || null,
-      Version: item.Version || null,
-      Description: item.Description || null
-    }));
+    // 整筆存下來，只清洗 key（不篩選欄位）
+    const firmwareList = (data.Members || []).map((item) => sanitizeKeys(item));
 
     /**
      * API 成功，但沒有 Members 或 Members 是空陣列
@@ -205,7 +273,7 @@ async function pollMachine(machine) {
      * 第一次成功或版本有變更
      */
     console.log(`[${machine.name}] 偵測到 Firmware 版本更新：`);
-    console.table(firmwareList);
+    console.table(firmwareList.map(({ Id, Description }) => ({ Id, Description })));
 
     // 寫入完整 Firmware 模組資訊
     writeHistoryRecord(historyFile, {
@@ -279,6 +347,28 @@ app.get('/machines', (req, res) => {
 
 /**
  * @openapi
+ * /metadata:
+ *   get:
+ *     summary: 查看 metadata.json 內容
+ *     responses:
+ *       200:
+ *         description: metadata.json 的完整內容
+ *       500:
+ *         description: 伺服器錯誤
+ */
+app.get('/metadata', (req, res) => {
+  try {
+    const fileContent = fs.readFileSync(METADATA_FILE, 'utf8');
+    res.json(JSON.parse(fileContent));
+  } catch (error) {
+    res.status(500).json({
+      error: error.message
+    });
+  }
+});
+
+/**
+ * @openapi
  * /history:
  *   get:
  *     summary: 查看所有機器目前儲存的歷史紀錄
@@ -294,7 +384,9 @@ app.get('/history', (req, res) => {
     const result = {};
 
     for (const machine of machines) {
-      result[machine.name] = readHistory(getHistoryFilePath(machine));
+      result[machine.name] = toSummaryHistory(
+        sortHistoryByTimestampDesc(readHistory(getHistoryFilePath(machine)))
+      );
     }
 
     res.json(result);
@@ -336,7 +428,9 @@ app.get('/history/:machine_type', (req, res) => {
       });
     }
 
-    res.json(readHistory(getHistoryFilePath(machine)));
+    res.json(toSummaryHistory(
+      sortHistoryByTimestampDesc(readHistory(getHistoryFilePath(machine)))
+    ));
   } catch (error) {
     res.status(500).json({
       error: error.message
