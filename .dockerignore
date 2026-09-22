@@ -5,3 +5,5 @@ npm-debug.log
 .env
 Dockerfile
 .dockerignore
+data
+docker-compose.yml

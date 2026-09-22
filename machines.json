@@ -2,7 +2,7 @@
     "machines": [
         {
             "name": "OALan Vader.TS2 for Bespin BMC",
-            "ip": "10.33.33.224",
+            "ip": "10.33.34.23",
             "machine_type": "TS2_BMC"
         },
         {

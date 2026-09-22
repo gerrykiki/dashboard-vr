@@ -1,0 +1,22 @@
+services:
+  dashboard:
+    build: .
+    image: wistron-dashboard:latest
+    container_name: wistron-dashboard
+    restart: unless-stopped
+    # 容器內以此 uid:gid 執行（非 root），需與 host 上 ./data 的擁有者一致，
+    # 否則 Dockerfile 裡的 `USER node`(uid 1000) 對 bind mount 進來的 ./data
+    # 沒有寫入權限，輪詢寫入歷史紀錄會失敗。
+    # 於 .env 設定 DASHBOARD_UID / DASHBOARD_GID（可用 `id -u` / `id -g` 取得）。
+    user: "${DASHBOARD_UID:-1000}:${DASHBOARD_GID:-1000}"
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      BMC_USERNAME: ${BMC_USERNAME:-root}
+      BMC_PASSWORD: ${BMC_PASSWORD:-0penBmc}
+    volumes:
+      # 保留輪詢寫入的 firmware 歷史紀錄
+      - ./data:/app/data
+      # 允許不重建 image 就能調整要輪詢的機器清單
+      - ./machines.json:/app/machines.json:ro
