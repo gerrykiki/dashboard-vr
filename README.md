@@ -65,11 +65,11 @@
 
 ### 更新機器 IP／清單，不用重新部署
 
-[docker-compose.yml](docker-compose.yml) 已將 `machines.json` 以唯讀 volume 掛進容器，且程式每次輪詢（每 30 秒）與每次呼叫 `/machines`、`/history` 等 API 都會重新讀檔，不會快取。
+[docker-compose.yml](docker-compose.yml) 已將 `machines.json` 以唯讀 volume 掛進容器，且程式每次輪詢（每 30 秒）與每次呼叫 `/api/machines`、`/api/history` 等 API 都會重新讀檔，不會快取。
 
 所以要調整機器 IP 或新增／移除機器時，直接編輯 host 上的 [machines.json](machines.json) 並存檔即可，**不需要 `docker compose build` 或 `restart`**，最慢 30 秒內下一輪輪詢就會套用新設定。
 
-> 若要立即套用而不想等下一輪，可呼叫 `GET /poll` 手動觸發一次輪詢。
+> 若要立即套用而不想等下一輪，可呼叫 `GET /api/poll` 手動觸發一次輪詢。
 
 ### 資料保存
 
@@ -106,10 +106,10 @@ npm run dev   # node --watch，程式碼變更自動重啟
 | 方法 | 路徑 | 說明 |
 | --- | --- | --- |
 | GET | `/` | 健康檢查用首頁 |
-| GET | `/machines` | 查看目前 `machines.json` 內容 |
-| GET | `/history` | 查看所有機器的 Firmware 歷史紀錄 |
-| GET | `/history/:machine_type` | 查看單一機器的歷史紀錄 |
-| GET | `/poll` | 手動觸發一次輪詢 |
+| GET | `/api/machines` | 查看目前 `machines.json` 內容 |
+| GET | `/api/history` | 查看所有機器的 Firmware 歷史紀錄 |
+| GET | `/api/history/:machine_type` | 查看單一機器的歷史紀錄 |
+| GET | `/api/poll` | 手動觸發一次輪詢 |
 | GET | `/api-docs` | Swagger API 文件 |
 
 ## 環境變數

@@ -325,7 +325,7 @@ app.get('/', (req, res) => {
 
 /**
  * @openapi
- * /machines:
+ * /api/machines:
  *   get:
  *     summary: 查看 machines.json 內容
  *     responses:
@@ -334,7 +334,7 @@ app.get('/', (req, res) => {
  *       500:
  *         description: 伺服器錯誤
  */
-app.get('/machines', (req, res) => {
+app.get('/api/machines', (req, res) => {
   try {
     const fileContent = fs.readFileSync(MACHINES_FILE, 'utf8');
     res.json(JSON.parse(fileContent));
@@ -347,7 +347,7 @@ app.get('/machines', (req, res) => {
 
 /**
  * @openapi
- * /metadata:
+ * /api/metadata:
  *   get:
  *     summary: 查看 metadata.json 內容
  *     responses:
@@ -356,7 +356,7 @@ app.get('/machines', (req, res) => {
  *       500:
  *         description: 伺服器錯誤
  */
-app.get('/metadata', (req, res) => {
+app.get('/api/metadata', (req, res) => {
   try {
     const fileContent = fs.readFileSync(METADATA_FILE, 'utf8');
     res.json(JSON.parse(fileContent));
@@ -369,7 +369,7 @@ app.get('/metadata', (req, res) => {
 
 /**
  * @openapi
- * /history:
+ * /api/history:
  *   get:
  *     summary: 查看所有機器目前儲存的歷史紀錄
  *     responses:
@@ -378,7 +378,7 @@ app.get('/metadata', (req, res) => {
  *       500:
  *         description: 伺服器錯誤
  */
-app.get('/history', (req, res) => {
+app.get('/api/history', (req, res) => {
   try {
     const machines = loadMachines();
     const result = {};
@@ -399,7 +399,7 @@ app.get('/history', (req, res) => {
 
 /**
  * @openapi
- * /history/{machine_type}:
+ * /api/history/{machine_type}:
  *   get:
  *     summary: 查看單一機器的歷史紀錄
  *     parameters:
@@ -417,7 +417,7 @@ app.get('/history', (req, res) => {
  *       500:
  *         description: 伺服器錯誤
  */
-app.get('/history/:machine_type', (req, res) => {
+app.get('/api/history/:machine_type', (req, res) => {
   try {
     const machines = loadMachines();
     const machine = machines.find((m) => m.machine_type === req.params.machine_type);
@@ -440,7 +440,7 @@ app.get('/history/:machine_type', (req, res) => {
 
 /**
  * @openapi
- * /poll:
+ * /api/poll:
  *   get:
  *     summary: 手動觸發一次所有機器的 Firmware 輪詢
  *     responses:
@@ -449,7 +449,7 @@ app.get('/history/:machine_type', (req, res) => {
  *       409:
  *         description: 目前已有輪詢正在執行
  */
-app.get('/poll', async (req, res) => {
+app.get('/api/poll', async (req, res) => {
   if (polling) {
     return res.status(409).json({
       message: '目前已有輪詢正在執行'
