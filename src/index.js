@@ -26,9 +26,14 @@ const ROOT_DIR = process.cwd();
 const DATA_DIR = path.join(ROOT_DIR, 'data');
 const MACHINES_FILE = path.join(ROOT_DIR, 'machines.json');
 const METADATA_FILE = path.join(ROOT_DIR, 'metadata.json');
+const DIST_DIR = path.join(ROOT_DIR, 'dist');
+const DIST_INDEX_FILE = path.join(DIST_DIR, 'index.html');
 
 // 如果 data 資料夾不存在，就自動建立
 fs.mkdirSync(DATA_DIR, { recursive: true });
+
+// 提供 Vue build 出來的靜態檔案（dist），若不存在則略過（例如本機開發環境）
+app.use(express.static(DIST_DIR));
 
 // 對應 curl -k，忽略 HTTPS 憑證驗證
 const httpsAgent = new Agent({
@@ -461,6 +466,18 @@ app.get('/api/poll', async (req, res) => {
   res.json({
     message: 'Firmware 輪詢完成'
   });
+});
+
+/**
+ * SPA fallback：非 API、非靜態檔案的 GET 請求一律回傳 dist/index.html，
+ * 讓 Vue Router（history mode）可以處理前端路由
+ */
+app.get(/^\/(?!api|api-docs).*/, (req, res, next) => {
+  if (!fs.existsSync(DIST_INDEX_FILE)) {
+    return next();
+  }
+
+  res.sendFile(DIST_INDEX_FILE);
 });
 
 /**
