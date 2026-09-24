@@ -2,23 +2,27 @@
     "machines": [
         {
             "name": "OALan Vader.TS2 for Bespin BMC",
-            "ip": "10.33.34.23",
-            "machine_type": "TS2_BMC"
+            "ip": "10.33.33.180",
+            "machine_type": "TS2_BMC",
+            "mac": "26:75:f2:cd:f6:59"
         },
         {
             "name": "OALan Vader.TS2 for Bespin BIOS",
             "ip": "10.33.33.187",
-            "machine_type": "TS2_BIOS"
+            "machine_type": "TS2_BIOS",
+            "mac": "8a:9a:8a:21:63:d1"
         },
         {
             "name": "OALan Vader.QS1 for Bespin BIOS",
             "ip": "10.33.33.71",
-            "machine_type": "QS1_BIOS"
+            "machine_type": "QS1_BIOS",
+            "mac": "16:23:8e:50:4f:4d"
         },
         {
             "name": "OALan Vader.QS1 for Bespin TSC",
             "ip": "10.33.33.173",
-            "machine_type": "QS1_TSC"    
+            "machine_type": "QS1_TSC",
+            "mac": "6e:b6:90:c2:4c:8e"
         }
     ]
 }

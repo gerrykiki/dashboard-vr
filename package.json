@@ -4,7 +4,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "node --watch src/index.js",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "sync-ips": "node scripts/sync-ips.js",
+    "sync-ips:once": "node scripts/sync-ips.js --once"
   },
   "author": "",
   "license": "ISC",
