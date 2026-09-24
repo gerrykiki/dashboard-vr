@@ -97,6 +97,23 @@
 npm run sync-ips:once
 ```
 
+#### 手動背景執行（關掉終端機／斷 SSH 後仍會繼續）
+
+不想設定 systemd 時，可用 `nohup` 手動啟動：
+
+```bash
+cd /opt/wistron-dashboard   # 換成實際專案路徑
+nohup npm run sync-ips > sync-ips.log 2>&1 &
+```
+
+- 看 log：`tail -f sync-ips.log`
+- 確認有在跑：`pgrep -af sync-ips`
+- 停止：`pkill -f scripts/sync-ips.js`
+
+若環境在登出時會清掉使用者的背景程序，改用 `setsid nohup npm run sync-ips > sync-ips.log 2>&1 &`，讓它完全脫離登入 session。
+
+> 手動啟動的程序在 host 重開機或程式異常結束後**不會自動回來**，需再手動啟動一次。要自動重啟請用下方 systemd 或 pm2。
+
 #### 以 systemd 常駐（Linux，建議）
 
 1. 建立 `/etc/systemd/system/wistron-sync-ips.service`（路徑、使用者請依實際環境調整，Node 路徑可用 `which node` 查詢）：
