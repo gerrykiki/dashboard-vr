@@ -11,8 +11,11 @@ services:
     user: "${DASHBOARD_UID:-1000}:${DASHBOARD_GID:-1000}"
     ports:
       - "3000:3000"
+      # https://nv-bundle.thbsms.com/（自簽憑證，產生方式見 README）
+      - "443:3443"
     environment:
       PORT: 3000
+      HTTPS_PORT: 3443
       BMC_USERNAME: ${BMC_USERNAME:-root}
       BMC_PASSWORD: ${BMC_PASSWORD:-0penBmc}
       # 連跳板機用的私鑰（由下方 secrets 掛入）
@@ -27,6 +30,8 @@ services:
       - ./machines.json:/app/machines.json:ro
       # 可由 POST /api/scripts/{name} 執行的 script，新增／修改不用重建 image
       - ./scripts:/app/scripts:ro
+      # HTTPS 自簽憑證（cert.pem / key.pem），不放進 image 也不進 git
+      - ./certs:/app/certs:ro
 
 secrets:
   # 私鑰路徑可在 .env 以 JUMP_SSH_KEY 調整，預設 ~/.ssh/id_ed25519

@@ -53,6 +53,7 @@
    ```
 
    服務啟動後會在 `http://<host>:3000` 提供 API，並立即開始第一次輪詢。
+   若 `certs/` 內有憑證，也會在 `https://nv-bundle.thbsms.com/`（host 443）提供 HTTPS，見下方「HTTPS（自簽憑證）」。
 
 4. 查看 log：
 
@@ -122,6 +123,23 @@ curl -X POST http://localhost:3000/api/scripts/hello.sh \
 - `./data`：每台機器的 Firmware 歷史紀錄（JSON，檔名為 `<machine_type>.json`），透過 volume 掛載，容器重建不會遺失。修改 `name` 不影響歷史紀錄，但 `machine_type` 改了就會接不上舊檔。
 - 舊版以 `name` 當檔名，升級後第一次讀取時會自動改名為 `<machine_type>.json`。
 
+## HTTPS（自簽憑證）
+
+內網使用，以自簽憑證提供 `https://nv-bundle.thbsms.com/`。瀏覽器會顯示「不安全」，按「繼續前往」即可。
+
+在部署機器的專案目錄產生一次憑證（效期 10 年），需用與 `DASHBOARD_UID` 相同的使用者執行，容器才讀得到私鑰：
+
+```bash
+mkdir -p certs
+openssl req -x509 -newkey rsa:2048 -nodes -days 3650 \
+  -keyout certs/key.pem -out certs/cert.pem \
+  -subj "/CN=nv-bundle.thbsms.com" \
+  -addext "subjectAltName=DNS:nv-bundle.thbsms.com,IP:10.33.33.179"
+docker compose up -d
+```
+
+`certs/` 不在 git 也不進 image。之後若取得公司 CA 發的憑證，直接覆蓋 `certs/cert.pem`、`certs/key.pem` 後重啟即可。
+
 ## 手動 Docker 指令（不使用 Compose）
 
 ```bash
@@ -167,5 +185,7 @@ npm run dev   # node --watch，程式碼變更自動重啟
 | 變數 | 說明 | 預設值 |
 | --- | --- | --- |
 | `PORT` | 服務監聽埠號 | `3000` |
+| `HTTPS_PORT` | HTTPS 監聽埠號（憑證存在才會啟動） | `3443` |
+| `TLS_CERT_FILE` / `TLS_KEY_FILE` | 憑證／私鑰路徑 | `certs/cert.pem` / `certs/key.pem` |
 | `BMC_USERNAME` | BMC Redfish API 帳號 | `root` |
 | `BMC_PASSWORD` | BMC Redfish API 密碼 | `0penBmc` |

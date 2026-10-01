@@ -7,3 +7,4 @@ Dockerfile
 .dockerignore
 data
 docker-compose.yml
+certs

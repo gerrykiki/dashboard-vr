@@ -2,6 +2,7 @@ const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const { Agent } = require('undici');
 const fs = require('fs');
+const https = require('https');
 const path = require('path');
 
 const swaggerSpec = require('./swagger');
@@ -15,6 +16,8 @@ app.use(express.json());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 const PORT = Number(process.env.PORT) || 3000;
+// HTTPS 埠號（容器內非 root 無法聽 443，由 docker-compose 把 host 443 對應過來）
+const HTTPS_PORT = Number(process.env.HTTPS_PORT) || 3443;
 const POLL_INTERVAL = 30 * 1000;
 
 const BMC_USERNAME = process.env.BMC_USERNAME || 'root';
@@ -32,6 +35,9 @@ const MACHINES_FILE = path.join(ROOT_DIR, 'machines.json');
 const METADATA_FILE = path.join(ROOT_DIR, 'metadata.json');
 const DIST_DIR = path.join(ROOT_DIR, 'dist');
 const DIST_INDEX_FILE = path.join(DIST_DIR, 'index.html');
+// 自簽憑證（產生方式見 README），兩個檔案都存在才會啟動 HTTPS
+const TLS_CERT_FILE = process.env.TLS_CERT_FILE || path.join(ROOT_DIR, 'certs', 'cert.pem');
+const TLS_KEY_FILE = process.env.TLS_KEY_FILE || path.join(ROOT_DIR, 'certs', 'key.pem');
 
 // 如果 data 資料夾不存在，就自動建立
 fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -718,3 +724,16 @@ app.listen(PORT, '0.0.0.0', () => {
   // Server 啟動後立即執行第一次輪詢
   pollAll();
 });
+
+if (fs.existsSync(TLS_CERT_FILE) && fs.existsSync(TLS_KEY_FILE)) {
+  const tlsOptions = {
+    cert: fs.readFileSync(TLS_CERT_FILE),
+    key: fs.readFileSync(TLS_KEY_FILE)
+  };
+
+  https.createServer(tlsOptions, app).listen(HTTPS_PORT, '0.0.0.0', () => {
+    console.log(`HTTPS server is running on port ${HTTPS_PORT}`);
+  });
+} else {
+  console.log(`找不到憑證（${TLS_CERT_FILE}），略過 HTTPS`);
+}
