@@ -1,28 +1,44 @@
 {
+    "machine_info_base": "https://es9-devops-report.thbsms.com/.cd-dashboard",
+    "jump_hosts": {
+        "factory-jump": {
+            "host": "10.38.114.76",
+            "port": 22,
+            "username": "guest",
+            "identity_file": "~/.ssh/id_ed25519"
+        }
+    },
     "machines": [
         {
             "name": "OALan Vader.TS2 for Bespin BMC",
-            "ip": "10.33.33.180",
             "machine_type": "TS2_BMC",
-            "mac": "26:75:f2:cd:f6:59"
+            "machine_info": ".oa-vader-ts2-26:75:f2:cd:f6:59/bmc_data.json",
+            "network": "OA"
         },
         {
             "name": "OALan Vader.TS2 for Bespin BIOS",
-            "ip": "10.33.33.187",
             "machine_type": "TS2_BIOS",
-            "mac": "8a:9a:8a:21:63:d1"
+            "machine_info": ".oa-vader-ts2-8a:9a:8a:21:63:d1/bmc_data.json",
+            "network": "OA"
         },
         {
             "name": "OALan Vader.QS1 for Bespin BIOS",
-            "ip": "10.33.33.71",
             "machine_type": "QS1_BIOS",
-            "mac": "16:23:8e:50:4f:4d"
+            "machine_info": ".oa-vader-qs1-16:23:8e:50:4f:4d/bmc_data.json",
+            "network": "OA"
         },
         {
             "name": "OALan Vader.QS1 for Bespin TSC",
-            "ip": "10.33.33.173",
             "machine_type": "QS1_TSC",
-            "mac": "6e:b6:90:c2:4c:8e"
+            "machine_info": ".oa-vader-qs1-6e:b6:90:c2:4c:8e/bmc_data.json",
+            "network": "OA"
+        },
+        {
+            "name": "Bespin Factory",
+            "machine_type": "BESPIN",
+            "jump_host": "factory-jump",
+            "ip": "192.168.172.207",
+            "network": "RD"
         }
     ]
 }
